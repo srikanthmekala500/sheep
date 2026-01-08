@@ -1,0 +1,244 @@
+FINAL COLUMN REQUIREMENT (Clear)
+
+You want ALL 3 sheets to include these common columns:
+
+SHEET NUMBER | DATE | NAME | EMPLOYEE ID | CATEGORY
+
+Sheet-wise data columns
+📄 Category_A
+
+Category = A + FD
+
+Columns:
+
+DATE | NAME | EMPLOYEE ID | CATEGORY | RHG | LHG | SHEET NUMBER
+
+📄 Category_B
+
+Category = B
+
+Columns:
+
+DATE | NAME | EMPLOYEE ID | CATEGORY | RHG | LHG | SHEET NUMBER
+
+📄 Category_Gown
+
+Category = A + B (❌ FD excluded)
+
+Columns:
+
+DATE | NAME | EMPLOYEE ID | CATEGORY | LHG | FHD | CHT | RFH | LFH | GLE | SHEET NUMBER
+
+Column Mapping (Source Sheet)
+Column	Field
+A	DATE
+B	NAME
+C	EMPLOYEE ID
+D	CATEGORY
+E	RHG
+F	LHG
+G	FHD
+H	CHT
+I	RFH
+J	LFH
+K	GLE
+L	SHEET NUMBER
+✅ FINAL VBA CODE (Fully Updated)
+Sub Separate_Category_Final()
+
+    Dim wsSrc As Worksheet
+    Dim wsA As Worksheet, wsB As Worksheet, wsG As Worksheet
+    Dim lastRow As Long, i As Long
+    Dim aRow As Long, bRow As Long, gRow As Long
+    Dim cat As String
+
+    Set wsSrc = ActiveSheet
+
+    Application.DisplayAlerts = False
+    On Error Resume Next
+    Sheets("Category_A").Delete
+    Sheets("Category_B").Delete
+    Sheets("Category_Gown").Delete
+    On Error GoTo 0
+    Application.DisplayAlerts = True
+
+    Set wsA = Sheets.Add: wsA.Name = "Category_A"
+    Set wsB = Sheets.Add: wsB.Name = "Category_B"
+    Set wsG = Sheets.Add: wsG.Name = "Category_Gown"
+
+    'Headers
+    wsA.Range("A1:G1").Value = Array("DATE", "NAME", "EMPLOYEE ID", "CATEGORY", "RHG", "LHG", "SHEET NUMBER")
+    wsB.Range("A1:G1").Value = Array("DATE", "NAME", "EMPLOYEE ID", "CATEGORY", "RHG", "LHG", "SHEET NUMBER")
+    wsG.Range("A1:K1").Value = Array("DATE", "NAME", "EMPLOYEE ID", "CATEGORY", "LHG", "FHD", "CHT", "RFH", "LFH", "GLE", "SHEET NUMBER")
+
+    aRow = 2: bRow = 2: gRow = 2
+    lastRow = wsSrc.Cells(wsSrc.Rows.Count, "A").End(xlUp).Row
+
+    For i = 2 To lastRow
+        cat = Trim(wsSrc.Cells(i, "D").Value)
+
+        'Category_A → A + FD
+        If cat = "A" Or cat = "FD" Then
+            wsA.Cells(aRow, 1).Resize(1, 4).Value = wsSrc.Cells(i, 1).Resize(1, 4).Value
+            wsA.Cells(aRow, 5).Value = wsSrc.Cells(i, "E").Value 'RHG
+            wsA.Cells(aRow, 6).Value = wsSrc.Cells(i, "F").Value 'LHG
+            wsA.Cells(aRow, 7).Value = wsSrc.Cells(i, "L").Value 'Sheet No
+            aRow = aRow + 1
+        End If
+
+        'Category_B → Only B
+        If cat = "B" Then
+            wsB.Cells(bRow, 1).Resize(1, 4).Value = wsSrc.Cells(i, 1).Resize(1, 4).Value
+            wsB.Cells(bRow, 5).Value = wsSrc.Cells(i, "E").Value 'RHG
+            wsB.Cells(bRow, 6).Value = wsSrc.Cells(i, "F").Value 'LHG
+            wsB.Cells(bRow, 7).Value = wsSrc.Cells(i, "L").Value 'Sheet No
+            bRow = bRow + 1
+        End If
+
+        'Category_Gown → A + B (FD excluded)
+        If cat = "A" Or cat = "B" Then
+            wsG.Cells(gRow, 1).Resize(1, 4).Value = wsSrc.Cells(i, 1).Resize(1, 4).Value
+            wsG.Cells(gRow, 5).Value = wsSrc.Cells(i, "F").Value 'LHG
+            wsG.Cells(gRow, 6).Value = wsSrc.Cells(i, "G").Value 'FHD
+            wsG.Cells(gRow, 7).Value = wsSrc.Cells(i, "H").Value 'CHT
+            wsG.Cells(gRow, 8).Value = wsSrc.Cells(i, "I").Value 'RFH
+            wsG.Cells(gRow, 9).Value = wsSrc.Cells(i, "J").Value 'LFH
+            wsG.Cells(gRow, 10).Value = wsSrc.Cells(i, "K").Value 'GLE
+            wsG.Cells(gRow, 11).Value = wsSrc.Cells(i, "L").Value 'Sheet No
+            gRow = gRow + 1
+        End If
+
+    Next i
+
+    MsgBox "All sheets created with full details successfully!", vbInformation
+
+End Sub
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+https://github.com/srikanthmekala500/DSA-in-JavaScript/tree/main/Sheep
+isolated colonies : MBO61
+>>>Alphabetically<<<<<
+
+Sub SortSheetsAlphabetically()								
+    Dim i As Integer, j As Integer								
+    Dim SheetCount As Integer								
+								
+    SheetCount = ThisWorkbook.Sheets.Count								
+								
+    For i = 1 To SheetCount - 1								
+        For j = i + 1 To SheetCount								
+            If UCase(ThisWorkbook.Sheets(j).Name) < UCase(ThisWorkbook.Sheets(i).Name) Then								
+                ThisWorkbook.Sheets(j).Move Before:=ThisWorkbook.Sheets(i)								
+            End If								
+        Next j								
+    Next i								
+								
+    MsgBox "Sheets have been sorted alphabetically.", vbInformation								
+End Sub								
+								
+
+
+>>>ListAllSheetNames<<<<<
+
+
+Sub ListAllSheetNames()
+    Dim ws As Worksheet
+    Dim summarySheet As Worksheet
+    Dim i As Long
+    
+    On Error Resume Next
+    ' Try to delete the existing summary sheet if it exists
+    Application.DisplayAlerts = False
+    Sheets("SheetList").Delete
+    Application.DisplayAlerts = True
+    On Error GoTo 0
+    
+    ' Add a new sheet for the summary
+    Set summarySheet = ThisWorkbook.Sheets.Add
+    summarySheet.Name = "SheetList"
+    
+    ' Loop through all sheets and write their names
+    i = 1
+    For Each ws In ThisWorkbook.Sheets
+        If ws.Name <> summarySheet.Name Then
+            summarySheet.Cells(i, 1).Value = ws.Name
+            i = i + 1
+        End If
+    Next ws
+    
+    MsgBox "All sheet names listed in 'SheetList'.", vbInformation
+End Sub
+
+>>>>>>>>>>>>>>>>>>>>>year<<<<<<<<<<<<
+let
+    Source = Excel.CurrentWorkbook(){[Name="Table4"]}[Content],
+    #"Changed Type" = Table.TransformColumnTypes(
+        Source,
+        {
+            {"Person Name & ID No", type text}, 
+            {"Person Name & ID No2", type text},
+            {"Person Name & ID No4", type text},
+            {"February Minimum", Int64.Type}, 
+            {"February Maximum", Int64.Type},
+            {"March Minimum", Int64.Type}, 
+            {"March Maximum", Int64.Type}, 
+            {"April Minimum", Int64.Type}, 
+            {"April Maximum", Int64.Type}
+        }
+    ),
+    
+    // Unpivot the name columns into rows
+    #"Unpivoted Names" = Table.UnpivotOtherColumns(
+        #"Changed Type",
+        {"February Minimum", "February Maximum", "March Minimum", "March Maximum", "April Minimum", "April Maximum"},
+        "Attribute",
+        "Person Name & ID"
+    ),
+    
+    // Optional: remove the Attribute column if not needed
+    #"Removed Attribute Column" = Table.RemoveColumns(#"Unpivoted Names", {"Attribute"})
+in
+    #"Removed Attribute Column"
+
+-----------------------------------------------------------
+let
+    // Load the table
+    Source = Excel.CurrentWorkbook(){[Name="Table1"]}[Content],
+
+    // Change column types
+    #"Changed Type" = Table.TransformColumnTypes(
+        Source,
+        {
+            {"Person Name & ID No", type text}, {"January Minimum", Int64.Type}, {"January Maximum", Int64.Type},
+            {"Person Name & ID No2", type text}, {"February Minimum", Int64.Type}, {"February Maximum", Int64.Type},
+            {"Person Name & ID No4", type text}, {"March Minimum", Int64.Type}, {"March Maximum", Int64.Type},
+            {"Person Name & ID No6", type text}, {"April Minimum", Int64.Type}, {"April Maximum", Int64.Type},
+            {"Person Name & ID No.", type text}, {"May Minimum", Int64.Type}, {"May Maximum", Int64.Type},
+            {"Person Name & ID No.9", type text}, {"June Minimum", Int64.Type}, {"June Maximum", Int64.Type},
+            {"Person Name & ID No.11", type text}, {"July Minimum", Int64.Type}, {"July Maximum", Int64.Type},
+            {"Person Name & ID No.13", type text}, {"August Minimum", Int64.Type}, {"August Maximum", Int64.Type},
+            {"Person Name & ID No.15", type text}, {"October Minimum", Int64.Type}, {"October Maximum", Int64.Type},
+            {"Person Name & ID No.17", type text}, {"November Minimum", Int64.Type}, {"November Maximum", Int64.Type}
+        }
+    ),
+
+    // Unpivot all the Person Name columns into one column
+    #"Unpivoted Names" = Table.UnpivotOtherColumns(
+        #"Changed Type",
+        {
+            "January Minimum", "January Maximum", "February Minimum", "February Maximum",
+            "March Minimum", "March Maximum", "April Minimum", "April Maximum",
+            "May Minimum", "May Maximum", "June Minimum", "June Maximum",
+            "July Minimum", "July Maximum", "August Minimum", "August Maximum",
+            "October Minimum", "October Maximum", "November Minimum", "November Maximum"
+        },
+        "Attribute",
+        "Person Name & ID"
+    ),
+
+    // Optional: remove the Attribute column if you don't need it
+    #"Removed Attribute Column" = Table.RemoveColumns(#"Unpivoted Names", {"Attribute"})
+in
+    #"Removed Attribute Column"
+
